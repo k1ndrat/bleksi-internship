@@ -14,6 +14,7 @@ import { useState } from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import React from "react";
 import MyAccordionItem from "@/components/MyAccordionItem";
+import Image from "next/image";
 // import classNames from "classnames";
 
 const colors = [
@@ -45,7 +46,9 @@ const RadixUICard = () => {
             Gucci
           </Heading>
           <Box flexGrow={"1"}>
-            <img
+            <Image
+              width={"1024"}
+              height={"1024"}
               src={currentImg}
               alt="product"
               className="object-cover h-full w-full max-h-96 md:max-h-full"
@@ -67,7 +70,9 @@ const RadixUICard = () => {
                     border: currentImg === img ? "2px solid black" : "",
                   }}
                 >
-                  <img
+                  <Image
+                    width={"1024"}
+                    height={"1024"}
                     src={img}
                     alt="product"
                     className="object-cover h-full w-full"
