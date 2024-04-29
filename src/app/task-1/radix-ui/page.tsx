@@ -60,8 +60,9 @@ const RadixUICard = () => {
         <Flex direction={"column"} gridColumnStart={"1"} gridRowStart={"2"}>
           <ScrollArea scrollbars="horizontal" style={{ height: "auto" }}>
             <Flex gap={"0.5rem"}>
-              {imgs.map((img) => (
+              {imgs.map((img, index) => (
                 <Box
+                  key={index}
                   flexBasis={"calc(20% - 0.4rem)"}
                   flexShrink={"0"}
                   className="cursor-pointer"
@@ -127,8 +128,9 @@ const RadixUICard = () => {
                 SIZE
               </Text>
               <Flex gap={"0.5rem"}>
-                {sizes.map((size) => (
+                {sizes.map((size, index) => (
                   <Flex
+                    key={index * 10}
                     className="w-9 h-9 rounded-full	transition-all cursor-pointer select-none	"
                     style={{
                       backgroundColor: currentSize === size ? "black" : "white",
@@ -149,8 +151,9 @@ const RadixUICard = () => {
                 COLOR
               </Text>
               <Flex gap={"0.5rem"}>
-                {colors.map((color) => (
+                {colors.map((color, index) => (
                   <Box
+                    key={index / 10}
                     className="w-9 h-9 rounded-full	cursor-pointer"
                     style={{
                       backgroundColor: color,
