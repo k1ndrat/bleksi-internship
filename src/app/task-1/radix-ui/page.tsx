@@ -10,7 +10,7 @@ import {
   Separator,
   Text,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import React from "react";
 import MyAccordionItem from "@/components/MyAccordionItem";
@@ -33,6 +33,74 @@ const RadixUICard = () => {
   const [currentSize, setCurrentSize] = useState<string>(sizes[0]);
   const [currentImg, setCurrentImg] = useState<string>(imgs[0]);
 
+  // scrolling gallery
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // the required distance between touchStart and touchEnd to be detected as a swipe
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: any) => {
+    e.preventDefault();
+    setTouchEnd(null); // otherwise the swipe is fired even with usual touch events
+    if (e?.clientX) {
+      setTouchStart(e.clientX);
+    } else {
+      setTouchStart(e.targetTouches[0].clientX);
+    }
+  };
+
+  const onTouchMove = (e: any) => {
+    e.preventDefault();
+    if (e?.clientX) {
+      setTouchEnd(e.clientX);
+    } else {
+      setTouchEnd(e.targetTouches[0].clientX);
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe || isRightSwipe)
+      console.log("swipe", isLeftSwipe ? "left" : "right");
+
+    const index = imgs.indexOf(currentImg);
+    if (index > 0 && isRightSwipe) {
+      setCurrentImg(imgs[index - 1]);
+      scrollToEl(imgs[index - 1]);
+    } else if (index === 0 && isRightSwipe) {
+      setCurrentImg(imgs[imgs.length - 1]);
+      scrollToEl(imgs[imgs.length - 1]);
+    }
+
+    if (index < imgs.length - 1 && isLeftSwipe) {
+      setCurrentImg(imgs[index + 1]);
+      scrollToEl(imgs[index + 1]);
+    } else if (index === imgs.length - 1 && isLeftSwipe) {
+      setCurrentImg(imgs[0]);
+      scrollToEl(imgs[0]);
+    }
+  };
+
+  const scrollToEl = (src: string) => {
+    if (galleryRef.current) {
+      const imgsList: NodeListOf<Element> =
+        galleryRef.current.querySelectorAll(`[src]`);
+
+      imgsList.forEach((element) => {
+        const elSrc = element.getAttribute("src") || "";
+        if (elSrc.includes(src.slice(1))) {
+          element.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white py-16 px-4">
       <Grid
@@ -45,13 +113,23 @@ const RadixUICard = () => {
           <Heading as="h2" className="mb-5 uppercase md:hidden">
             Gucci
           </Heading>
-          <Box flexGrow={"1"}>
+          <Box
+            flexGrow={"1"}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onMouseDown={onTouchStart}
+            onMouseMove={onTouchMove}
+            onMouseUp={onTouchEnd}
+          >
             <Image
               width={"1024"}
               height={"1024"}
               src={currentImg}
               alt="product"
-              className="object-cover h-full w-full max-h-96 md:max-h-full"
+              className="object-cover h-full w-full max-h-96 md:max-h-full select-none"
+              draggable="false"
+              style={{ pointerEvents: "none", userSelect: "none" }}
             />
           </Box>
         </Flex>
@@ -59,7 +137,7 @@ const RadixUICard = () => {
         {/* GALLERY CONTROLS */}
         <Flex direction={"column"} gridColumnStart={"1"} gridRowStart={"2"}>
           <ScrollArea scrollbars="horizontal" style={{ height: "auto" }}>
-            <Flex gap={"0.5rem"}>
+            <Flex gap={"0.5rem"} ref={galleryRef}>
               {imgs.map((img, index) => (
                 <Box
                   key={index}
@@ -210,8 +288,8 @@ const RadixUICard = () => {
                 <path
                   d="M4.89346 2.35248C3.49195 2.35248 2.35248 3.49359 2.35248 4.90532C2.35248 6.38164 3.20954 7.9168 4.37255 9.33522C5.39396 10.581 6.59464 11.6702 7.50002 12.4778C8.4054 11.6702 9.60608 10.581 10.6275 9.33522C11.7905 7.9168 12.6476 6.38164 12.6476 4.90532C12.6476 3.49359 11.5081 2.35248 10.1066 2.35248C9.27059 2.35248 8.81894 2.64323 8.5397 2.95843C8.27877 3.25295 8.14623 3.58566 8.02501 3.88993C8.00391 3.9429 7.98315 3.99501 7.96211 4.04591C7.88482 4.23294 7.7024 4.35494 7.50002 4.35494C7.29765 4.35494 7.11523 4.23295 7.03793 4.04592C7.01689 3.99501 6.99612 3.94289 6.97502 3.8899C6.8538 3.58564 6.72126 3.25294 6.46034 2.95843C6.18109 2.64323 5.72945 2.35248 4.89346 2.35248ZM1.35248 4.90532C1.35248 2.94498 2.936 1.35248 4.89346 1.35248C6.0084 1.35248 6.73504 1.76049 7.20884 2.2953C7.32062 2.42147 7.41686 2.55382 7.50002 2.68545C7.58318 2.55382 7.67941 2.42147 7.79119 2.2953C8.265 1.76049 8.99164 1.35248 10.1066 1.35248C12.064 1.35248 13.6476 2.94498 13.6476 4.90532C13.6476 6.74041 12.6013 8.50508 11.4008 9.96927C10.2636 11.3562 8.92194 12.5508 8.00601 13.3664C7.94645 13.4194 7.88869 13.4709 7.83291 13.5206C7.64324 13.6899 7.3568 13.6899 7.16713 13.5206C7.11135 13.4709 7.05359 13.4194 6.99403 13.3664C6.0781 12.5508 4.73641 11.3562 3.59926 9.96927C2.39872 8.50508 1.35248 6.74041 1.35248 4.90532Z"
                   fill="currentColor"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
               Wishlist
