@@ -175,7 +175,7 @@ const RadixUICard = () => {
             }}
           >
             <Button
-              className="uppercase bg-black p-12 grow"
+              // className="uppercase bg-black p-12 grow"
               radius="none"
               style={{
                 padding: "2rem",
@@ -183,6 +183,7 @@ const RadixUICard = () => {
                 textTransform: "uppercase",
                 flexGrow: 1,
                 border: "2px solid black",
+                cursor: "pointer",
               }}
             >
               Add to card
@@ -196,6 +197,7 @@ const RadixUICard = () => {
                 color: "black",
                 textTransform: "uppercase",
                 border: "2px solid black",
+                cursor: "pointer",
               }}
             >
               <svg

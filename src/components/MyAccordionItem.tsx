@@ -13,7 +13,7 @@ const MyAccordionItem = ({ title, children, value }: props) => {
   return (
     <Accordion.Item value={value} className="AccordionItem">
       <Accordion.Trigger className="AccordionTrigger  flex justify-between content-center	w-full">
-        <Text className="p-4">{title}</Text>
+        <Text className="p-4 font-bold">{title}</Text>
         <Box className="p-4 AccordionChevron">
           <svg
             width="20"
